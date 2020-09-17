@@ -16,6 +16,4 @@ typedef struct {
 void GetFrequency(FREQUENCY_INFO_t* cpuFrequency);
 
 
-
-
 #endif
