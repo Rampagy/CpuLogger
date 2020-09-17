@@ -16,12 +16,28 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
             /** When the pattern is found save the frequency. */
             if ( std::regex_search( line, match, expression ) )
             {
-                /** TODO: Save rather than print. */
-                std::cout << match[1] << std::endl;
+
+                /** Get the frequency and convert to float. */
+                float freq = std::stof( match[1] );
+
+                /** Save the frequency. */
+                threadFrequencies.push_back( freq );
+                cpuFrequency->average += freq;
+                if ( freq > cpuFrequency->max )
+                {
+                    cpuFrequency->max = freq;
+                }
+                if ( freq < cpuFrequency->min )
+                {
+                    cpuFrequency->min = freq;
+                }
             }
         }
 
-        /** Close file */
+        /** Close file. */
         cpuInfo.close();
+
+        /** Calculate outputs. */
+        cpuFrequency->average /= threadFrequencies.size();
     }
 }
