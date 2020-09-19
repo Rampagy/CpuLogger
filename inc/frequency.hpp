@@ -1,7 +1,6 @@
 #if !defined(FREQUENCY_HPP)
 #define FREQUENCY_HPP
 
-#include <iostream>
 #include <fstream>
 #include <list>
 

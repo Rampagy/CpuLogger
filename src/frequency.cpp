@@ -1,6 +1,5 @@
 #include "frequency.hpp"
 
-
 /** Go through /proc/cpuinfo and extract cpu frequencies. */
 void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
 {

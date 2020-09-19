@@ -1,73 +1,73 @@
 #include <chrono>
+#include <iostream>
 
+#include "arguments.hpp"
 #include "frequency.hpp"
 #include "unistd.h"
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[])
 {
-    /** TODO: Create argument parsing. */
-
     /** TODO: Create graceful ctrl+c exit. */
 
-    /** TODO: Add function for printing data. */
+    /** Settings that can be overwritten from the command line */
+    float interval = 0.02;
+    args_t settings = {
+        (uint64_t)(interval*1000000),
+        (uint64_t)(15/interval),
+        (uint64_t)(5/interval), 
+    };
 
-    /** settings that can be set from the command line */
-    uint64_t waitTime = 5;
-    uint64_t evaluationTime = 15;
-    float evaluationInterval = 0.02;
-
-    /** Convert from seconds to microseconds/ticks. */
-    uint64_t evaluationInterval_us = evaluationInterval * 1000000;
-    uint64_t totalTicks = (waitTime + evaluationTime) / evaluationInterval;
-    uint64_t waitTicks = waitTime / evaluationInterval;
-
-    /** Colect CPU frequency at specified interval. */
-    float runningAverage = 0.0f;
-    FREQUENCY_INFO_t cpuInfo = { 0.0f, 9999.0f, 0.0f };
-    auto start = std::chrono::high_resolution_clock::now();
-
-    for (uint64_t i = 0; i < totalTicks; i++)
+    /** Parse arguments. */
+    if ( !parseArguments( argc, argv, &settings ) )
     {
-        if (i > waitTicks)
+        /** Collect CPU frequency at specified interval. */
+        float runningAverage = 0.0f;
+        FREQUENCY_INFO_t cpuInfo = { 0.0f, 9999.0f, 0.0f };
+        auto start = std::chrono::high_resolution_clock::now();
+
+        /** Start sampling. */
+        for (uint64_t i = 0; i < settings.waitTicks + settings.durationTicks; i++)
         {
-            /** Only reset CPU frequency average. */
-            cpuInfo.average = 0.0f;
+            if (i > settings.waitTicks)
+            {
+                /** Only reset CPU frequency average. */
+                cpuInfo.average = 0.0f;
 
-            /** Get new cpu frequencies. */
-            GetFrequency( &cpuInfo );
+                /** Get new cpu frequencies. */
+                GetFrequency( &cpuInfo );
 
-            /** Calculate average without saving every single value. */
-            runningAverage -= runningAverage / (i - waitTicks);
-            runningAverage += cpuInfo.average / (i - waitTicks);
+                /** Calculate average without saving every single value. */
+                runningAverage -= runningAverage / (i - settings.waitTicks);
+                runningAverage += cpuInfo.average / (i - settings.waitTicks);
 
-            /** Make results look pretty. */
-            char buffer[50];
-            std::sprintf(buffer,
-                    "    Min: %0.1f MHz  Freq: %0.1f MHz  Max: %0.1f MHz",
-                    cpuInfo.min,
-                    cpuInfo.average,
-                    cpuInfo.max);
+                /** Make the results look pretty. */
+                char buffer[50];
+                std::sprintf(buffer,
+                        "    Min: %0.1f MHz  Freq: %0.1f MHz  Max: %0.1f MHz",
+                        cpuInfo.min,
+                        cpuInfo.average,
+                        cpuInfo.max);
 
-            /** Print results. */
-            std::cout << buffer << "\r" << std::flush;;
+                /** Print results. */
+                std::cout << buffer << "\r" << std::flush;;
+            }
+            else if (i == 0)
+            {
+                std::cout << "    Loading...\n" << std::flush;
+            }
+
+            /** Wait designated time. */
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>
+                    ( std::chrono::high_resolution_clock::now() - start );
+            usleep( settings.evaluationInterval_us - duration.count());
+            start = std::chrono::high_resolution_clock::now();
         }
-        else if (i == 0)
-        {
-            std::cout << "  Loading...\r" << std::flush;
-        }
 
-        /** Wait designated time. */
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>
-                ( std::chrono::high_resolution_clock::now() - start );
-        usleep( evaluationInterval_us - duration.count());
-        start = std::chrono::high_resolution_clock::now();
+        /** Print overall average. */
+        char buffer[50];
+        std::sprintf(buffer,
+                "    Average: %0.1f MHz",
+                runningAverage);
+        std::cout << std::endl << buffer << std::endl;
     }
-
-    /** Print overall average. */
-    char buffer[50];
-    std::sprintf(buffer,
-            "    Average: %0.1f MHz",
-            runningAverage);
-
-    std::cout << std::endl << buffer << std::endl;
 }
