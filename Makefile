@@ -22,7 +22,7 @@ CpuLogger: $(OUT_FILES)
 	@$(CC) -o $@ $^ $(CFLAGS)
 
 # out files depend on source files
-$(OUT_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OUT_DIR)/%.o: $(SRC_DIR)/%.cpp Makefile
 	$(CC) -c $(CFLAGS) -o $@ $< 
 
 # Clean up, clean up, everybody clean up
