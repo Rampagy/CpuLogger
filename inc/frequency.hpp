@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 #include <list>
-#include <regex>
 
 typedef struct {
     float average;
