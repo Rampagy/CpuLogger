@@ -7,11 +7,13 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
     std::string file;
     std::string line;
     line.reserve(2000);
-    std::list<float> threadFrequencies;
+
     std::ifstream cpuInfo( "/proc/cpuinfo" );
 
     if ( cpuInfo.is_open() )
     {
+        std::list<float> threadFrequencies;
+
         /** Core frequency is stored every 28 lines starting at line 8. */
         /** Iterate through each line and save to buffer. */
         uint64_t count = 1;
@@ -50,5 +52,7 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
 
         /** Calculate outputs. */
         cpuFrequency->average /= threadFrequencies.size();
+
+
     }
 }
