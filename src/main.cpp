@@ -1,20 +1,23 @@
 #include <chrono>
 #include <iostream>
+#include <unistd.h>
 
 #include "arguments.hpp"
+#include "cleanup.hpp"
 #include "frequency.hpp"
-#include "unistd.h"
+
 
 int main(int argc, char* argv[])
 {
-    /** TODO: Create graceful ctrl+c exit. */
+    /** Setup graceful exits. */
+    signal( SIGINT, signalCallbackHandler );
 
     /** Settings that can be overwritten from the command line */
     float interval = 0.02;
     args_t settings = {
-        (uint64_t)(interval*1000000),
-        (uint64_t)(15/interval),
-        (uint64_t)(5/interval), 
+        (uint64_t)(interval*1000000),   // interval
+        (uint64_t)(60/interval),        // duration
+        (uint64_t)(1/interval),         // wait time
     };
 
     /** Parse arguments. */
@@ -28,7 +31,7 @@ int main(int argc, char* argv[])
         /** Start sampling. */
         for (uint64_t i = 0; i < settings.waitTicks + settings.durationTicks; i++)
         {
-            if (i > settings.waitTicks)
+            if (i >= settings.waitTicks)
             {
                 /** Only reset CPU frequency average. */
                 cpuInfo.average = 0.0f;
@@ -37,13 +40,13 @@ int main(int argc, char* argv[])
                 GetFrequency( &cpuInfo );
 
                 /** Calculate average without saving every single value. */
-                runningAverage -= runningAverage / (i - settings.waitTicks);
-                runningAverage += cpuInfo.average / (i - settings.waitTicks);
+                runningAverage -= runningAverage / ((i + 1) - settings.waitTicks);
+                runningAverage += cpuInfo.average / ((i + 1) - settings.waitTicks);
 
                 /** Make the results look pretty. */
-                char buffer[50];
+                char buffer[300];
                 std::sprintf(buffer,
-                        "    Min: %0.1f MHz  Freq: %0.1f MHz  Max: %0.1f MHz",
+                        "    Min: %0.1f MHz  Freq: %0.1f MHz  Max: %0.1f MHz                      ",
                         cpuInfo.min,
                         cpuInfo.average,
                         cpuInfo.max);
@@ -61,6 +64,12 @@ int main(int argc, char* argv[])
                     ( std::chrono::high_resolution_clock::now() - start );
             usleep( settings.evaluationInterval_us - duration.count());
             start = std::chrono::high_resolution_clock::now();
+
+            /* Exit loop if signal interrupt is detected. */
+            if (sigIntExit)
+            {
+                break;
+            }
         }
 
         /** Print overall average. */

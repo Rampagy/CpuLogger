@@ -1,9 +1,10 @@
-#ifndef ARGUMENTS_HPP
+#if !defined(ARGUMENTS_HPP)
 #define ARGUMENTS_HPP
 
 #include <iostream>
 
-typedef struct {
+typedef struct
+{
     uint64_t evaluationInterval_us;
     uint64_t durationTicks;
     uint64_t waitTicks;
