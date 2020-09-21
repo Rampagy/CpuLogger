@@ -62,7 +62,8 @@ int main(int argc, char* argv[])
             /** Wait designated time. */
             auto duration = std::chrono::duration_cast<std::chrono::microseconds>
                     ( std::chrono::high_resolution_clock::now() - start );
-            usleep( settings.evaluationInterval_us - duration.count());
+            int64_t sleepTime = settings.evaluationInterval_us - duration.count();
+            usleep( (sleepTime > 0) * sleepTime );
             start = std::chrono::high_resolution_clock::now();
 
             /* Exit loop if signal interrupt is detected. */
