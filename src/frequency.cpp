@@ -13,16 +13,11 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
     {
         std::list<float> threadFrequencies;
 
-        /** Core frequency is stored every 28 lines starting at line 8. */
         /** Iterate through each line and save to buffer. */
-        uint64_t count = 1;
-        uint64_t freqLine = 8;
         while ( std::getline( cpuInfo, line ) )
         {
-            if (count >= freqLine)
+            if ( line.substr(0, 11) == "cpu MHz		: " )
             {
-                freqLine += 28;
-
                 // frequency starts on character 11 and ends on character 16
                 std::string strFreq;
                 for (uint8_t i = 11; i <= 16; i++)
@@ -46,12 +41,9 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
                     cpuFrequency->min = freq;
                 }
             }
-            count++;
         }
 
         /** Calculate outputs. */
         cpuFrequency->average /= threadFrequencies.size();
-
-
     }
 }
