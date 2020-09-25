@@ -9,12 +9,9 @@
 #include "temperature.hpp"
 
 
-/** TODO:   Add reading temperatures from these locations
- *          /sys/class/hwmon/hwmon* /temp*_input 
- *          /sys/class/hwmon/hwmon* /temp*_label 
+/** TODO:   Add pretty output of data that overwrites multiple lines of itself.
  * 
- *  NOTE:   Will need to interate through folders 
- *          looking for things that meet the above pattern.
+ *  REF:    https://stackoverflow.com/questions/47340610/c-overwrite-multiple-lines-that-were-previously-output-to-console
 **/
 
 int main(int argc, char* argv[])
