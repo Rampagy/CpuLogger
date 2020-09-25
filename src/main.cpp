@@ -12,6 +12,7 @@
 /** TODO:   Add pretty output of data that overwrites multiple lines of itself.
  * 
  *  REF:    https://stackoverflow.com/questions/47340610/c-overwrite-multiple-lines-that-were-previously-output-to-console
+ *          https://en.wikipedia.org/wiki/ANSI_escape_code
 **/
 
 int main(int argc, char* argv[])
@@ -54,7 +55,12 @@ int main(int argc, char* argv[])
                 /** Get new CPU temperatures. */
                 GetTemperatures( &temperatureInfo );
 
+                /** Clear screen and set cursor to position 0,0. */
+                std::printf("\033[2J");
+                std::printf("\033[%d;%dH", 0, 0);
+
                 /** Print out the CPU temperatures to see if everything works. */
+                std::cout << std::endl;
                 for (std::map<std::string, float>::iterator it = temperatureInfo.begin(); it != temperatureInfo.end(); ++it)
                     std::cout << it->first << " => " << it->second << std::endl;
 
@@ -84,6 +90,8 @@ int main(int argc, char* argv[])
             /* Exit loop if signal interrupt is detected. */
             if (sigIntExit)
             {
+                std::printf("\033[2J");
+                std::printf("\033[%d;%dH", 0, 0);
                 break;
             }
         }
