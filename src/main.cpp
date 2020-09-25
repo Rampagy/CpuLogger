@@ -1,11 +1,21 @@
 #include <chrono>
 #include <iostream>
 #include <unistd.h>
+#include <map>
 
 #include "arguments.hpp"
 #include "cleanup.hpp"
 #include "frequency.hpp"
+#include "temperature.hpp"
 
+
+/** TODO:   Add reading temperatures from these locations
+ *          /sys/class/hwmon/hwmon* /temp*_input 
+ *          /sys/class/hwmon/hwmon* /temp*_label 
+ * 
+ *  NOTE:   Will need to interate through folders 
+ *          looking for things that meet the above pattern.
+**/
 
 int main(int argc, char* argv[])
 {
@@ -33,8 +43,9 @@ int main(int argc, char* argv[])
         {
             if (i >= settings.waitTicks)
             {
-                /** Only reset CPU frequency average. */
+                /** Reset CPU frequency average and CPU temperatures. */
                 cpuInfo.average = 0.0f;
+                std::map<std::string, float> temperatureInfo;
 
                 /** Get new cpu frequencies. */
                 GetFrequency( &cpuInfo );
@@ -42,6 +53,13 @@ int main(int argc, char* argv[])
                 /** Calculate average without saving every single value. */
                 runningAverage -= runningAverage / ((i + 1) - settings.waitTicks);
                 runningAverage += cpuInfo.average / ((i + 1) - settings.waitTicks);
+
+                /** Get new CPU temperatures. */
+                GetTemperatures( &temperatureInfo );
+
+                /** Print out the CPU temperatures to see if everything works. */
+                for (std::map<std::string, float>::iterator it = temperatureInfo.begin(); it != temperatureInfo.end(); ++it)
+                    std::cout << it->first << " => " << it->second << std::endl;
 
                 /** Make the results look pretty. */
                 char buffer[300];

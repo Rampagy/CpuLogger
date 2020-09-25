@@ -5,7 +5,7 @@ OUT_DIR := ./out
 
 # Set build parameters
 CC := g++
-CFLAGS := -I$(INC_DIR)
+CFLAGS := -I$(INC_DIR) -std=c++17
 
 # Add INC_DIR prefix to all dependencies
 DEPS = $(INC_DIR)/$(wildcard *.hpp)
