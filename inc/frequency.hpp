@@ -5,9 +5,10 @@
 #include <list>
 
 typedef struct {
-    float average;
+    float current;
     float min;
     float max;
+    float average;
 } FREQUENCY_INFO_t;
 
 

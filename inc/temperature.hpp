@@ -4,7 +4,7 @@
 #include <map>
 #include <string>
 #include <filesystem>
-#include <iostream>
+//#include <iostream>
 #include <fstream>
 
 void GetTemperatures( std::map<std::string, float>* temperatureInfo );

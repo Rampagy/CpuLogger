@@ -3,6 +3,7 @@
 /** Go through /proc/cpuinfo and extract cpu frequencies. */
 void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
 {
+    static uint64_t count = 1;
     std::string file;
     std::string line;
     line.reserve(2000);
@@ -30,7 +31,7 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
 
                 /** Save the frequency. */
                 threadFrequencies.push_back( freq );
-                cpuFrequency->average += freq;
+                cpuFrequency->current += freq;
 
                 if ( freq > cpuFrequency->max )
                 {
@@ -44,6 +45,11 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
         }
 
         /** Calculate outputs. */
-        cpuFrequency->average /= threadFrequencies.size();
+        cpuFrequency->current /= threadFrequencies.size();
+
+        /** Calculate average. */
+        cpuFrequency->average -= cpuFrequency->average / count;
+        cpuFrequency->average += cpuFrequency->current / count;
+        count++;
     }
 }
