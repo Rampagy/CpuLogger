@@ -15,21 +15,12 @@ uint8_t parseArguments(int argc, char* argv[], args_t* settings)
             std::cout << "Options: " << std::endl;
             std::cout << "  --help                      Display this information." << std::endl;
             std::cout << "  --version                   Display compiler version information." << std::endl;
-            std::cout << "  -d=<duration>               Length of time to sample cpu frequency, in seconds." << std::endl;
             std::cout << "  -w=<wait_time>              Length of time to wait before sampling, in seconds." << std::endl;
         }
         else if (argument == "--version")
         {
             exit = 1;
             std::cout << "1.0.0.0" << std::endl;
-        }
-        else if (argument.substr(0, 3) == "-d=")
-        {
-            if ( ( argument.size() > 3 ) && CheckNumeric( argument.substr( 3, argument.size() ) ) )
-            {
-                uint64_t dur = std::stoi( argument.substr( 3, argument.size() ) );
-                settings->durationTicks = dur / ((float)settings->evaluationInterval_us / 1000000);
-            }
         }
         else if (argument.substr(0, 3) == "-w=")
         {

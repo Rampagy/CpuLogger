@@ -6,7 +6,6 @@
 typedef struct
 {
     uint64_t evaluationInterval_us;
-    uint64_t durationTicks;
     uint64_t waitTicks;
 } args_t;
 

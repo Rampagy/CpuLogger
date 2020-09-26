@@ -21,11 +21,10 @@ int main(int argc, char* argv[])
     /** Setup graceful exits. */
     signal( SIGINT, signalCallbackHandler );
 
-    /** Settings that can be overwritten from the command line */
+    /** Settings that can be overwritten from the command line. */
     float interval = 0.10;
     args_t settings = {
         (uint64_t)(interval*1000000),   // interval
-        (uint64_t)(60/interval),        // duration
         (uint64_t)(0/interval),         // wait time
     };
 
@@ -36,8 +35,9 @@ int main(int argc, char* argv[])
         FREQUENCY_INFO_t cpuInfo = { 0.0f, 9999.0f, 0.0f , 0.0f };
         auto start = std::chrono::high_resolution_clock::now();
 
-        /** Start sampling. */
-        for (uint64_t i = 0; i < settings.waitTicks + settings.durationTicks; i++)
+        /** Exit loop if signal interrupt is detected. */
+        uint64_t i = 0;
+        while ( !sigIntExit )
         {
             if (i >= settings.waitTicks)
             {
@@ -66,11 +66,7 @@ int main(int argc, char* argv[])
             usleep( (sleepTime > 0) * sleepTime );
             start = std::chrono::high_resolution_clock::now();
 
-            /* Exit loop if signal interrupt is detected. */
-            if (sigIntExit)
-            {
-                break;
-            }
+            i++;
         }
 
         /** Clear console before exiting. */
