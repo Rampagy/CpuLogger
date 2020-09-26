@@ -9,13 +9,6 @@
 #include "temperature.hpp"
 #include "output.hpp"
 
-
-/** TODO:   Add pretty output of data that overwrites multiple lines of itself.
- * 
- *  REF:    https://stackoverflow.com/questions/47340610/c-overwrite-multiple-lines-that-were-previously-output-to-console
- *          https://en.wikipedia.org/wiki/ANSI_escape_code
-**/
-
 int main(int argc, char* argv[])
 {
     /** Setup graceful exits. */
