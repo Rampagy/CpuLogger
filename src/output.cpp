@@ -9,19 +9,19 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
     ClearConsole();
 
     /** Print CPU temperatures to the terminal. */
-    printf( "  Temperature\n" );
+    printf( "       Temperature\n" );
     for (std::map<std::string, float>::iterator it = temperatureInfo->begin(); it != temperatureInfo->end(); ++it)
     {
-        printf( "%30s:  %6.1f %-5s\n", it->first.c_str(),  "°C", it->second );
+        printf( "%30s:  %6.1f %-5s\n", it->first.c_str(), it->second, "°C" );
     }
 
     /** Print frequencies to the terminal */
     printf( "\n" );
-    printf( "  Frequency\n" );
-    printf( format, "Average",  "MHz", cpuInfo->average );
-    printf( format, "Min",      "MHz", cpuInfo->min     );
-    printf( format, "Current",  "MHz", cpuInfo->current );
-    printf( format, "Max",      "MHz", cpuInfo->max     );
+    printf( "       Frequency\n" );
+    printf( format, "Average",  cpuInfo->average,  "MHz" );
+    printf( format, "Min",      cpuInfo->min,      "MHz" );
+    printf( format, "Current",  cpuInfo->current,  "MHz" );
+    printf( format, "Max",      cpuInfo->max,      "MHz" );
 }
 
 void ClearConsole( void )
