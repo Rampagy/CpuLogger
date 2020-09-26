@@ -8,11 +8,10 @@ CC := g++
 CFLAGS := -I$(INC_DIR) -std=c++17
 
 # Add INC_DIR prefix to all dependencies
-DEPS = $(wildcard $(INC_DIR)/*.hpp)
+DEPS := $(wildcard $(INC_DIR)/*.hpp)
 
 # Add OUT_DIR prefix to all out files
 SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
-
 
 # Convert SRC files to their corresponding out files
 OUT_FILES := $(patsubst $(SRC_DIR)/%.cpp, $(OUT_DIR)/%.o, $(SRC_FILES))
