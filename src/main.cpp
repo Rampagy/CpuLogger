@@ -14,6 +14,9 @@ int main(int argc, char* argv[])
     /** Setup graceful exits. */
     signal( SIGINT, signalCallbackHandler );
 
+    /** Setup printing. */
+    InitScreen();
+
     /** Settings that can be overwritten from the command line. */
     float interval = 0.10;
     args_t settings = {
@@ -47,10 +50,6 @@ int main(int argc, char* argv[])
                 /** Print the results. */
                 PrintResults( &cpuInfo, &temperatureInfo );
             }
-            else if (i == 0)
-            {
-                printf( "    Waiting...\n" );
-            }
 
             /** Wait designated time. */
             auto duration = std::chrono::duration_cast<std::chrono::microseconds>
@@ -61,8 +60,8 @@ int main(int argc, char* argv[])
 
             i++;
         }
-
-        /** Clear console before exiting. */
-        ClearConsole();
     }
+
+    /** Restore screen. */
+    RestoreScreen();
 }
