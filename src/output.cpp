@@ -10,6 +10,9 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
     /** Track how many lines have been output to the window. */
     uint16_t lnCount = 0;
 
+    /** Clear the screen. */
+    clear();
+
     /** Print CPU temperatures to the terminal. */
     attron( HEADER_CONFIG );
     mvaddstr(lnCount, 22, "Temperature");
