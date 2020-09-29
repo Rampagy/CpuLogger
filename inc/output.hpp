@@ -9,15 +9,12 @@
 #include "temperature.hpp"
 
 /** Color pair indices. */
-#define HOT_COLOR       (1)
-#define COLD_COLOR      (2)
-#define FAST_COLOR      (3)
-#define SLOW_COLOR      (4)
-#define HEADER_COLOR    (5)
-#define DEFAULT_COLOR   (6)
+#define HEADER_PAIR         (1)
+#define DEFAULT_PAIR        (2)
+#define BACKGROUND_COLOR    (255)
 
-/** Set the header config. */
-#define HEADER_CONFIG ( A_BOLD | COLOR_PAIR( HEADER_COLOR ) )
+/** Define header config. */
+#define HEADER_CONFIG       ( COLOR_PAIR( HEADER_PAIR ) | A_BOLD )
 
 
 void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temperatureInfo );

@@ -21,34 +21,14 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
 
     for (std::map<std::string, float>::iterator it = temperatureInfo->begin(); it != temperatureInfo->end(); ++it)
     {
-        uint8_t colorCode = 0;
         if ( has_colors() == TRUE )
         {
-            attron( COLOR_PAIR( DEFAULT_COLOR ) );
-            if ( it->second > 75.0 )
-            {
-                colorCode = HOT_COLOR;
-            }
-            else if ( it->second < 45.0 )
-            {
-                colorCode = COLD_COLOR;
-            }
-
-            if (colorCode == 0)
-            {
-                colorCode = DEFAULT_COLOR;
-            }
+            attron( COLOR_PAIR( DEFAULT_PAIR ) );
         }
 
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%25s: ", it->first.c_str() );
         mvaddstr( lnCount, 0, buffer );
-
-        if (colorCode != DEFAULT_COLOR && colorCode != 0)
-        {
-            attroff( COLOR_PAIR( DEFAULT_COLOR ) );
-            attron( COLOR_PAIR( colorCode ) );
-        }
 
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%6.1f ", it->second );
@@ -58,9 +38,9 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
         sprintf( buffer, "%-5s", "°C" );
         addstr( buffer );
 
-        if ( colorCode != 0)
+        if ( has_colors() == TRUE )
         {
-            attroff( COLOR_PAIR( colorCode ) );
+            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
         }
 
         lnCount++;
@@ -77,7 +57,6 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
 
     PrintFrequency( &lnCount, &buffer[0], "Min", cpuInfo->min, "MHz" );
     PrintFrequency( &lnCount, &buffer[0], "Current", cpuInfo->current, "MHz" );
-    PrintFrequency( &lnCount, &buffer[0], "Average", cpuInfo->average, "MHz" );
     PrintFrequency( &lnCount, &buffer[0], "Max", cpuInfo->max, "MHz" );
 
     refresh();
@@ -106,12 +85,10 @@ void InitScreen( void )
     {
         start_color();
 
-        init_pair(HOT_COLOR, 202, COLOR_BLACK);
-        init_pair(COLD_COLOR, 28, COLOR_BLACK);
-        init_pair(FAST_COLOR, 28, COLOR_BLACK);
-        init_pair(SLOW_COLOR, 208, COLOR_BLACK);
-        init_pair(HEADER_COLOR, 15, COLOR_BLACK);
-        init_pair(DEFAULT_COLOR, 254, COLOR_BLACK);
+        init_pair(HEADER_PAIR, 15, 234);
+        init_pair(DEFAULT_PAIR, 254, 234);
+
+        bkgdset( COLOR_PAIR( DEFAULT_PAIR ) );
     }
 }
 
@@ -123,35 +100,14 @@ void RestoreScreen( void )
 
 void PrintFrequency( uint16_t *lnCount, char* buffer, std::string label, float val, std::string units )
 {
-    uint8_t colorCode = 0;
-
     if ( ( has_colors() == TRUE ) )
     {
-        attron( COLOR_PAIR( DEFAULT_COLOR ) );
-        if ( val > 4000.0 )
-        {
-            colorCode = FAST_COLOR;
-        }
-        else if ( val < 2000.0 )
-        {
-            colorCode = SLOW_COLOR;
-        }
-
-        if (colorCode == 0)
-        {
-            colorCode = DEFAULT_COLOR;
-        }
+        attron( COLOR_PAIR( DEFAULT_PAIR ) );
     }
 
     memset( &buffer[0], 0, sizeof(buffer) );
     sprintf( buffer, "%25s: ", label.c_str() );
     mvaddstr( *lnCount, 0, buffer );
-
-    if (colorCode != DEFAULT_COLOR && colorCode != 0)
-    {
-        attroff( COLOR_PAIR( DEFAULT_COLOR ) );
-        attron( COLOR_PAIR( colorCode ) );
-    }
 
     memset( &buffer[0], 0, sizeof(buffer) );
     sprintf( buffer, "%4.1f ", val );
@@ -161,9 +117,9 @@ void PrintFrequency( uint16_t *lnCount, char* buffer, std::string label, float v
     sprintf( buffer, "%-5s", units.c_str() );
     addstr( buffer );
 
-    if ( colorCode != 0 )
+    if ( has_colors() == TRUE )
     {
-        attroff( COLOR_PAIR( colorCode ) );
+        attroff( COLOR_PAIR( DEFAULT_PAIR ) );
     }
 
     (*lnCount)++;
