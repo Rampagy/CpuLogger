@@ -2,7 +2,6 @@
 #define FREQUENCY_HPP
 
 #include <fstream>
-#include <list>
 #include <map>
 
 
