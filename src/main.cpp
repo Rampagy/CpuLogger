@@ -7,6 +7,7 @@
 #include "cleanup.hpp"
 #include "frequency.hpp"
 #include "temperature.hpp"
+#include "fan.hpp"
 #include "output.hpp"
 
 int main(int argc, char* argv[])
@@ -39,8 +40,9 @@ int main(int argc, char* argv[])
         {
             if (i >= settings.waitTicks)
             {
-                /** Reset CPU frequency average and CPU temperatures. */
+                /** Reset CPU temperatures. */
                 std::map<std::string, float> temperatureInfo;
+                std::map<std::string, float> fanInfo;
 
                 /** Get new cpu frequencies. */
                 GetFrequency( &frequencyInfo );
@@ -48,8 +50,11 @@ int main(int argc, char* argv[])
                 /** Get new CPU temperatures. */
                 GetTemperatures( &temperatureInfo );
 
+                /** Get fan information. */
+                GetFans( &fanInfo );
+
                 /** Print the results. */
-                PrintResults( &frequencyInfo, &temperatureInfo );
+                PrintResults( &frequencyInfo, &temperatureInfo, &fanInfo );
             }
 
             /** Wait designated time. */

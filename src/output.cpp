@@ -1,22 +1,23 @@
 #include "output.hpp"
 
 
-void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo )
+void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo, std::map<std::string, float>* fanInfo )
 {
     /** Format for outputting data. */
     char buffer[100];
 
-    /** Track how many lines have been output to the window. */
-    uint16_t lnCount = 0;
+    /** Track how many lines have been output to the window. 
+     *  One index per column. */
+    uint16_t lnCount[2] = { 0 };
 
     /** Clear the screen. */
     clear();
 
     /** Print CPU temperatures to the terminal. */
     attron( HEADER_CONFIG );
-    (void)PrintTerminal( lnCount, 22, "Temperature" );
+    (void)PrintTerminal( lnCount[0], 22, "Temperature" );
     attroff( HEADER_CONFIG );
-    lnCount++;
+    lnCount[0]++;
 
     for (std::map<std::string, float>::iterator it = temperatureInfo->begin(); it != temperatureInfo->end(); ++it)
     {
@@ -27,24 +28,24 @@ void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::s
 
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%25s: %6.1f °C", it->first.c_str(), it->second );
-        (void)PrintTerminal( lnCount, 0, buffer );
+        (void)PrintTerminal( lnCount[0], 0, buffer );
 
         if ( has_colors() == TRUE )
         {
             attroff( COLOR_PAIR( DEFAULT_PAIR ) );
         }
 
-        lnCount++;
+        lnCount[0]++;
     }
 
     /** Skip one line between frequencies and temperatures. */
-    lnCount++;
+    lnCount[0]++;
 
     /** Print frequencies to the terminal. */
     attron( HEADER_CONFIG );
-    (void)PrintTerminal( lnCount, 24, "Frequency" );
+    (void)PrintTerminal( lnCount[0], 24, "Frequency" );
     attroff( HEADER_CONFIG );
-    lnCount++;
+    lnCount[0]++;
 
     for (std::map<std::string, float>::iterator it = frequencyInfo->begin(); it != frequencyInfo->end(); ++it)
     {
@@ -55,14 +56,39 @@ void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::s
 
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%25s: %4.1f MHz", it->first.c_str(), it->second );
-        (void)PrintTerminal( lnCount, 0, buffer );
+        (void)PrintTerminal( lnCount[0], 0, buffer );
 
         if ( has_colors() == TRUE )
         {
             attroff( COLOR_PAIR( DEFAULT_PAIR ) );
         }
 
-        lnCount++;
+        lnCount[0]++;
+    }
+
+    /** Print CPU temperatures to the terminal. */
+    attron( HEADER_CONFIG );
+    (void)PrintTerminal( lnCount[1], 48, "Fans" );
+    attroff( HEADER_CONFIG );
+    lnCount[1]++;
+
+    for (std::map<std::string, float>::iterator it = fanInfo->begin(); it != fanInfo->end(); ++it)
+    {
+        if ( ( has_colors() == TRUE ) )
+        {
+            attron( COLOR_PAIR( DEFAULT_PAIR ) );
+        }
+
+        memset( &buffer[0], 0, sizeof(buffer) );
+        sprintf( buffer, "%5s: %5.0f RPM", it->first.c_str(), it->second );
+        (void)PrintTerminal( lnCount[1], 43, buffer );
+
+        if ( has_colors() == TRUE )
+        {
+            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
+        }
+
+        lnCount[1]++;
     }
 
     refresh();
@@ -106,27 +132,25 @@ void RestoreScreen( void )
     endwin();
 }
 
+
 bool PrintTerminal( uint16_t lineCount, uint16_t column, std::string output )
 {
     bool ret = false;
-    if (lineCount < (LINES - 1) )
+    if ( (lineCount < LINES) && (column < COLS) )
     {
-        if ( column < (COLS - 1) )
+        std::string modOutput;
+
+        if ( (COLS - 1) < (column + output.size()) )
         {
-            std::string modOutput;
-
-            if ( ( COLS - 1 ) < ( column + output.size() ) )
-            {
-                modOutput = output.substr(0, COLS);
-            }
-            else
-            {
-                modOutput = output;
-            }
-
-            mvaddstr( lineCount, column, modOutput.c_str() );
-            ret = true;
+            modOutput = output.substr(0, COLS - column);
         }
+        else
+        {
+            modOutput = output;
+        }
+
+        mvaddstr( lineCount, column, modOutput.c_str() );
+        ret = true;
     }
 
     return ret;

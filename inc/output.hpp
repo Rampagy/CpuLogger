@@ -17,7 +17,7 @@
 #define HEADER_CONFIG       ( COLOR_PAIR( HEADER_PAIR ) | A_BOLD )
 
 
-void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo );
+void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo, std::map<std::string, float>* fanInfo );
 
 void InitScreen( void );
 
