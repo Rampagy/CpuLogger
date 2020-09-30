@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {
     /** Setup graceful exits. */
-    signal( SIGINT, signalCallbackHandler );
+    signal( 0x1F, signalCallbackHandler );
 
     /** Setup printing. */
     InitScreen();
@@ -24,11 +24,13 @@ int main(int argc, char* argv[])
         (uint64_t)(0/interval),         // wait time
     };
 
+    /** Variables that can't reset through the loop. */
+    std::map<std::string, float> frequencyInfo;
+
     /** Parse arguments. */
     if ( !parseArguments( argc, argv, &settings ) )
     {
         /** Collect CPU frequency at specified interval. */
-        FREQUENCY_INFO_t cpuInfo = { 0.0f, 9999.0f, 0.0f , 0.0f };
         auto start = std::chrono::high_resolution_clock::now();
 
         /** Exit loop if signal interrupt is detected. */
@@ -38,17 +40,16 @@ int main(int argc, char* argv[])
             if (i >= settings.waitTicks)
             {
                 /** Reset CPU frequency average and CPU temperatures. */
-                cpuInfo.current = 0.0f;
                 std::map<std::string, float> temperatureInfo;
 
                 /** Get new cpu frequencies. */
-                GetFrequency( &cpuInfo );
+                GetFrequency( &frequencyInfo );
 
                 /** Get new CPU temperatures. */
                 GetTemperatures( &temperatureInfo );
 
                 /** Print the results. */
-                PrintResults( &cpuInfo, &temperatureInfo );
+                PrintResults( &frequencyInfo, &temperatureInfo );
             }
 
             /** Wait designated time. */

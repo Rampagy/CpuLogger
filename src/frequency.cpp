@@ -1,9 +1,8 @@
 #include "frequency.hpp"
 
 /** Go through /proc/cpuinfo and extract cpu frequencies. */
-void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
+void GetFrequency( std::map<std::string, float>* frequencyInfo )
 {
-    static uint64_t count = 1;
     std::string file;
     std::string line;
     line.reserve(2000);
@@ -12,7 +11,8 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
 
     if ( cpuInfo.is_open() )
     {
-        std::list<float> threadFrequencies;
+        uint16_t threadCount = 0;
+        float cumulativeFreq = 0;
 
         /** Iterate through each line and save to buffer. */
         while ( std::getline( cpuInfo, line ) )
@@ -30,26 +30,41 @@ void GetFrequency( FREQUENCY_INFO_t* cpuFrequency )
                 float freq = std::stof( strFreq );
 
                 /** Save the frequency. */
-                threadFrequencies.push_back( freq );
-                cpuFrequency->current += freq;
+                cumulativeFreq += freq;
 
-                if ( freq > cpuFrequency->max )
+                std::map<std::string, float>::iterator it = frequencyInfo->find("Max");
+                if ( it == frequencyInfo->end() ) 
                 {
-                    cpuFrequency->max = freq;
+                    frequencyInfo->insert( std::pair<std::string, float>("Max", freq) );
                 }
-                if ( freq < cpuFrequency->min )
+                else if ( freq > it->second )
                 {
-                    cpuFrequency->min = freq;
+                    it->second = freq;
                 }
+
+                it = frequencyInfo->find("Min");
+                if ( it == frequencyInfo->end() ) 
+                {
+                    frequencyInfo->insert( std::pair<std::string, float>("Min", freq) );
+                }
+                else if ( freq < it->second )
+                {
+                    it->second = freq;
+                }
+
+                threadCount++;
             }
         }
 
-        /** Calculate outputs. */
-        cpuFrequency->current /= threadFrequencies.size();
-
-        /** Calculate average. */
-        cpuFrequency->average -= cpuFrequency->average / count;
-        cpuFrequency->average += cpuFrequency->current / count;
-        count++;
+        cumulativeFreq = cumulativeFreq / threadCount;
+        std::map<std::string, float>::iterator it = frequencyInfo->find("Current");
+        if ( it == frequencyInfo->end() )
+        {
+            frequencyInfo->insert( std::pair<std::string, float>("Current", cumulativeFreq) );
+        }
+        else
+        {
+            it->second = cumulativeFreq;
+        }
     }
 }

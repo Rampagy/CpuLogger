@@ -17,12 +17,14 @@
 #define HEADER_CONFIG       ( COLOR_PAIR( HEADER_PAIR ) | A_BOLD )
 
 
-void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temperatureInfo );
+void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo );
 
 void InitScreen( void );
 
 void RestoreScreen( void );
 
 void PrintFrequency( uint16_t *lnCount, char* buffer, std::string label, float val, std::string units );
+
+bool PrintTerminal( uint16_t lineCount, uint16_t column, std::string output );
 
 #endif

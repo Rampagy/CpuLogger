@@ -3,16 +3,10 @@
 
 #include <fstream>
 #include <list>
-
-typedef struct {
-    float current;
-    float min;
-    float max;
-    float average;
-} FREQUENCY_INFO_t;
+#include <map>
 
 
-void GetFrequency(FREQUENCY_INFO_t* cpuFrequency);
+void GetFrequency( std::map<std::string, float>* frequencyInfo);
 
 
 #endif

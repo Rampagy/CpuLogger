@@ -1,8 +1,7 @@
 #include "output.hpp"
 
-uint64_t lineCount = 0;
 
-void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temperatureInfo )
+void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo )
 {
     /** Format for outputting data. */
     char buffer[100];
@@ -15,7 +14,7 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
 
     /** Print CPU temperatures to the terminal. */
     attron( HEADER_CONFIG );
-    mvaddstr(lnCount, 22, "Temperature");
+    (void)PrintTerminal( lnCount, 22, "Temperature" );
     attroff( HEADER_CONFIG );
     lnCount++;
 
@@ -27,16 +26,8 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
         }
 
         memset( &buffer[0], 0, sizeof(buffer) );
-        sprintf( buffer, "%25s: ", it->first.c_str() );
-        mvaddstr( lnCount, 0, buffer );
-
-        memset( &buffer[0], 0, sizeof(buffer) );
-        sprintf( buffer, "%6.1f ", it->second );
-        addstr( buffer );
-
-        memset( &buffer[0], 0, sizeof(buffer) );
-        sprintf( buffer, "%-5s", "°C" );
-        addstr( buffer );
+        sprintf( buffer, "%25s: %6.1f °C", it->first.c_str(), it->second );
+        (void)PrintTerminal( lnCount, 0, buffer );
 
         if ( has_colors() == TRUE )
         {
@@ -51,16 +42,32 @@ void PrintResults( FREQUENCY_INFO_t* cpuInfo, std::map<std::string, float>* temp
 
     /** Print frequencies to the terminal. */
     attron( HEADER_CONFIG );
-    mvaddstr( lnCount, 24, "Frequency" );
+    (void)PrintTerminal( lnCount, 24, "Frequency" );
     attroff( HEADER_CONFIG );
     lnCount++;
 
-    PrintFrequency( &lnCount, &buffer[0], "Min", cpuInfo->min, "MHz" );
-    PrintFrequency( &lnCount, &buffer[0], "Current", cpuInfo->current, "MHz" );
-    PrintFrequency( &lnCount, &buffer[0], "Max", cpuInfo->max, "MHz" );
+    for (std::map<std::string, float>::iterator it = frequencyInfo->begin(); it != frequencyInfo->end(); ++it)
+    {
+        if ( ( has_colors() == TRUE ) )
+        {
+            attron( COLOR_PAIR( DEFAULT_PAIR ) );
+        }
+
+        memset( &buffer[0], 0, sizeof(buffer) );
+        sprintf( buffer, "%25s: %4.1f MHz", it->first.c_str(), it->second );
+        (void)PrintTerminal( lnCount, 0, buffer );
+
+        if ( has_colors() == TRUE )
+        {
+            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
+        }
+
+        lnCount++;
+    }
 
     refresh();
 }
+
 
 void InitScreen( void )
 {
@@ -92,35 +99,35 @@ void InitScreen( void )
     }
 }
 
+
 void RestoreScreen( void )
 {
     /** Use curses to restore the screen. */
     endwin();
 }
 
-void PrintFrequency( uint16_t *lnCount, char* buffer, std::string label, float val, std::string units )
+bool PrintTerminal( uint16_t lineCount, uint16_t column, std::string output )
 {
-    if ( ( has_colors() == TRUE ) )
+    bool ret = false;
+    if (lineCount < (LINES - 1) )
     {
-        attron( COLOR_PAIR( DEFAULT_PAIR ) );
+        if ( column < (COLS - 1) )
+        {
+            std::string modOutput;
+
+            if ( ( COLS - 1 ) < ( column + output.size() ) )
+            {
+                modOutput = output.substr(0, COLS);
+            }
+            else
+            {
+                modOutput = output;
+            }
+
+            mvaddstr( lineCount, column, modOutput.c_str() );
+            ret = true;
+        }
     }
 
-    memset( &buffer[0], 0, sizeof(buffer) );
-    sprintf( buffer, "%25s: ", label.c_str() );
-    mvaddstr( *lnCount, 0, buffer );
-
-    memset( &buffer[0], 0, sizeof(buffer) );
-    sprintf( buffer, "%4.1f ", val );
-    addstr( buffer );
-
-    memset( &buffer[0], 0, sizeof(buffer) );
-    sprintf( buffer, "%-5s", units.c_str() );
-    addstr( buffer );
-
-    if ( has_colors() == TRUE )
-    {
-        attroff( COLOR_PAIR( DEFAULT_PAIR ) );
-    }
-
-    (*lnCount)++;
+    return ret;
 }
