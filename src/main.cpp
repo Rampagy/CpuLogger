@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <iostream>
 #include <map>
+#include <thread>
 
 #include "arguments.hpp"
 #include "cleanup.hpp"
@@ -45,14 +46,15 @@ int main(int argc, char* argv[])
                 std::map<std::string, float> temperatureInfo;
                 std::map<std::string, float> fanInfo;
 
-                /** Get new cpu frequencies. */
-                GetFrequency( &frequencyInfo );
+                /** Create thread for each data gathering function. */
+                std::thread t1(GetFrequency, &frequencyInfo);
+                std::thread t2(GetTemperatures, &temperatureInfo);
+                std::thread t3(GetFans, &fanInfo);
 
-                /** Get new CPU temperatures. */
-                GetTemperatures( &temperatureInfo );
-
-                /** Get fan information. */
-                GetFans( &fanInfo );
+                /** Wait for each thread to finish. */
+                t1.join();
+                t2.join();
+                t3.join();
 
                 /** Print the results. */
                 PrintResults( &frequencyInfo, &temperatureInfo, &fanInfo, duration.count() );

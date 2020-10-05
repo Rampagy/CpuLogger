@@ -78,17 +78,17 @@ void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::s
 
     /** Print miscelaneous figures. */
     (void)SetAttrib( true, HEADER_CONFIG );
-    (void)PrintTerminal( lnCount[1], 45, "Miscellaneous" );
+    (void)PrintTerminal( lnCount[1], 44, "Miscellaneous" );
     (void)SetAttrib( false, HEADER_CONFIG );
     lnCount[1]++;
 
     /** Clear out buffer and add new data. */
     memset( &buffer[0], 0, sizeof(buffer) );
-    sprintf( buffer, "%5s: %4.1f ms", "Loop Time", (float)duration / 1000);
+    sprintf( buffer, "%5s: %4.1f ms", "Exec Time", (float)duration / 1000);
 
     /** Print loop duration. */
     (void)SetAttrib( true, COLOR_PAIR( DEFAULT_PAIR ) );
-    (void)PrintTerminal( lnCount[1], 43, buffer );
+    (void)PrintTerminal( lnCount[1], 42, buffer );
     (void)SetAttrib( false, COLOR_PAIR( DEFAULT_PAIR ) );
     lnCount[1]++;
 
