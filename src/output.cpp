@@ -1,40 +1,34 @@
 #include "output.hpp"
 
 
-void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo, std::map<std::string, float>* fanInfo )
+void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::string, float>* temperatureInfo, std::map<std::string, float>* fanInfo, uint64_t duration )
 {
     /** Format for outputting data. */
     char buffer[100];
 
-    /** Track how many lines have been output to the window. 
-     *  One index per column. */
+    /** Track how many lines have been output to the window.    *
+     *  One index per column.                                   */
     uint16_t lnCount[2] = { 0 };
 
     /** Clear the screen. */
     clear();
 
     /** Print CPU temperatures to the terminal. */
-    attron( HEADER_CONFIG );
+    (void)SetAttrib( true, HEADER_CONFIG );
     (void)PrintTerminal( lnCount[0], 22, "Temperature" );
-    attroff( HEADER_CONFIG );
+    (void)SetAttrib( false, HEADER_CONFIG );
     lnCount[0]++;
 
     for (std::map<std::string, float>::iterator it = temperatureInfo->begin(); it != temperatureInfo->end(); ++it)
     {
-        if ( has_colors() == TRUE )
-        {
-            attron( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        /** Clear out buffer and add new data. */
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%25s: %6.1f °C", it->first.c_str(), it->second );
+
+        /** Set attributes and print. */
+        (void)SetAttrib( true, COLOR_PAIR( DEFAULT_PAIR ) );
         (void)PrintTerminal( lnCount[0], 0, buffer );
-
-        if ( has_colors() == TRUE )
-        {
-            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        (void)SetAttrib( false, COLOR_PAIR( DEFAULT_PAIR ) );
         lnCount[0]++;
     }
 
@@ -42,54 +36,61 @@ void PrintResults( std::map<std::string, float>*  frequencyInfo, std::map<std::s
     lnCount[0]++;
 
     /** Print frequencies to the terminal. */
-    attron( HEADER_CONFIG );
+    (void)SetAttrib( true, HEADER_CONFIG );
     (void)PrintTerminal( lnCount[0], 24, "Frequency" );
-    attroff( HEADER_CONFIG );
+    (void)SetAttrib( false, HEADER_CONFIG );
     lnCount[0]++;
 
     for (std::map<std::string, float>::iterator it = frequencyInfo->begin(); it != frequencyInfo->end(); ++it)
     {
-        if ( ( has_colors() == TRUE ) )
-        {
-            attron( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        /** Clear out buffer and add new data. */
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%25s: %4.1f MHz", it->first.c_str(), it->second );
+
+        /** Set attributes and print. */
+        (void)SetAttrib( true, COLOR_PAIR( DEFAULT_PAIR ) );
         (void)PrintTerminal( lnCount[0], 0, buffer );
-
-        if ( has_colors() == TRUE )
-        {
-            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        (void)SetAttrib( false, COLOR_PAIR( DEFAULT_PAIR ) );
         lnCount[0]++;
     }
 
-    /** Print CPU temperatures to the terminal. */
-    attron( HEADER_CONFIG );
+    /** Print fan speeds to the terminal. */
+    (void)SetAttrib( true, HEADER_CONFIG );
     (void)PrintTerminal( lnCount[1], 48, "Fans" );
-    attroff( HEADER_CONFIG );
+    (void)SetAttrib( false, HEADER_CONFIG );
     lnCount[1]++;
 
     for (std::map<std::string, float>::iterator it = fanInfo->begin(); it != fanInfo->end(); ++it)
     {
-        if ( ( has_colors() == TRUE ) )
-        {
-            attron( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        /** Clear out buffer and add new data. */
         memset( &buffer[0], 0, sizeof(buffer) );
         sprintf( buffer, "%5s: %5.0f RPM", it->first.c_str(), it->second );
+
+        /** Set attributes and print. */
+        (void)SetAttrib( true, COLOR_PAIR( DEFAULT_PAIR ) );
         (void)PrintTerminal( lnCount[1], 43, buffer );
-
-        if ( has_colors() == TRUE )
-        {
-            attroff( COLOR_PAIR( DEFAULT_PAIR ) );
-        }
-
+        (void)SetAttrib( false, COLOR_PAIR( DEFAULT_PAIR ) );
         lnCount[1]++;
     }
+
+    /** Skip one line between fan speeds and miscellaneous. */
+    lnCount[1]++;
+
+    /** Print miscelaneous figures. */
+    (void)SetAttrib( true, HEADER_CONFIG );
+    (void)PrintTerminal( lnCount[1], 45, "Miscellaneous" );
+    (void)SetAttrib( false, HEADER_CONFIG );
+    lnCount[1]++;
+
+    /** Clear out buffer and add new data. */
+    memset( &buffer[0], 0, sizeof(buffer) );
+    sprintf( buffer, "%5s: %4.1f ms", "Loop Time", (float)duration / 1000);
+
+    /** Print loop duration. */
+    (void)SetAttrib( true, COLOR_PAIR( DEFAULT_PAIR ) );
+    (void)PrintTerminal( lnCount[1], 43, buffer );
+    (void)SetAttrib( false, COLOR_PAIR( DEFAULT_PAIR ) );
+    lnCount[1]++;
 
     refresh();
 }
@@ -154,4 +155,21 @@ bool PrintTerminal( uint16_t lineCount, uint16_t column, std::string output )
     }
 
     return ret;
+}
+
+bool SetAttrib( bool turnOn, uint64_t attributes )
+{
+    bool changed = false;
+    if ( turnOn && has_colors() == TRUE )
+    {
+        attron( attributes );
+        changed = true;
+    }
+    else if ( !turnOn && has_colors() == TRUE )
+    {
+        attroff( attributes );
+        changed = true;
+    }
+
+    return changed;
 }

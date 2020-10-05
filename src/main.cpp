@@ -33,6 +33,7 @@ int main(int argc, char* argv[])
     {
         /** Collect CPU frequency at specified interval. */
         auto start = std::chrono::high_resolution_clock::now();
+        std::chrono::microseconds duration;
 
         /** Exit loop if signal interrupt is detected. */
         uint64_t i = 0;
@@ -54,11 +55,11 @@ int main(int argc, char* argv[])
                 GetFans( &fanInfo );
 
                 /** Print the results. */
-                PrintResults( &frequencyInfo, &temperatureInfo, &fanInfo );
+                PrintResults( &frequencyInfo, &temperatureInfo, &fanInfo, duration.count() );
             }
 
             /** Wait designated time. */
-            auto duration = std::chrono::duration_cast<std::chrono::microseconds>
+            duration = std::chrono::duration_cast<std::chrono::microseconds>
                     ( std::chrono::high_resolution_clock::now() - start );
             int64_t sleepTime = settings.evaluationInterval_us - duration.count();
             usleep( (sleepTime > 0) * sleepTime );
