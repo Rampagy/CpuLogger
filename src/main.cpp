@@ -46,15 +46,15 @@ int main(int argc, char* argv[])
                 std::map<std::string, float> temperatureInfo;
                 std::map<std::string, float> fanInfo;
 
-                /** Create thread for each data gathering function. */
-                std::thread t1(GetFrequency, &frequencyInfo);
-                std::thread t2(GetTemperatures, &temperatureInfo);
-                std::thread t3(GetFans, &fanInfo);
+                /** Create thread for each data gathering function. Slowest to fastest. */
+                std::thread t1(GetTemperatures, &temperatureInfo);      // 5.0 ms
+                std::thread t2(GetFans, &fanInfo);                      // 3.5 ms
+                std::thread t3(GetFrequency, &frequencyInfo);           // 1.5 ms
 
                 /** Wait for each thread to finish. */
-                t1.join();
-                t2.join();
                 t3.join();
+                t2.join();
+                t1.join();
 
                 /** Print the results. */
                 PrintResults( &frequencyInfo, &temperatureInfo, &fanInfo, duration.count() );
