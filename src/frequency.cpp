@@ -20,11 +20,7 @@ void GetFrequency( std::map<std::string, float>* frequencyInfo )
             if ( line.substr(0, 11) == "cpu MHz		: " )
             {
                 // frequency starts on character 11 and ends on character 16
-                std::string strFreq;
-                for (uint8_t i = 11; i <= 16; i++)
-                {
-                    strFreq += line[i];
-                }
+                std::string strFreq = line.substr( 11, line.size() );
 
                 /** Convert to float. */
                 float freq = std::stof( strFreq );
